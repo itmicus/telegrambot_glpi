@@ -63,7 +63,7 @@ TXT;
 
             $DB->beginTransaction();
 
-            $table = 'glpi.glpi_tickets';
+            $table = 'glpi_tickets';
 
             $params = [
                 'name' => $new_ticket_data->title,
@@ -81,14 +81,15 @@ TXT;
             ];
 
             $result = $DB->insert($table, $params);
+    //            throw new Exception("TelegramBotLog:params".json_encode($params));
 
             if (!$result) {
                 throw new Exception("Your Ticket could not be saved to the database. Error to insert Ticket data.");
             }
 
-            $ticket_id = $DB->insert_id();
+            $ticket_id = $DB->insertId();
 
-            $table = 'glpi.glpi_tickets_users';
+            $table = 'glpi_tickets_users';
 
             $params = [
                 'tickets_id' => $ticket_id,
@@ -135,10 +136,10 @@ TXT;
             return false;
         }
 
-        $response = 'Ticket not found.';
+        $response = 'Ticket '.$text.' not found.';
 
         $ticket_data = self::getTicketData($ticket_id);
-
+        
         if ($ticket_data) {
             $ticket_id = $ticket_data['id'];
             $ticket_title = $ticket_data['name'];
@@ -194,7 +195,7 @@ RESPONSE;
 
         $followup_text = "<p>$followup_text</p>";
 
-        $table = 'glpi.glpi_itilfollowups';
+        $table = 'glpi_itilfollowups';
 
         $params = [
             'itemtype' => 'Ticket',
@@ -230,17 +231,20 @@ RESPONSE;
     {
         global $DB;
 
-        $iterator = $DB->request([
-            'FROM' => 'glpi.glpi_tickets',
+   $iterator = $DB->request([
+'SELECT' => ['glpi_tickets.id','glpi_tickets.name','glpi_tickets.content'],
+            'FROM' => 'glpi_tickets',
             'WHERE' => [
-                'glpi.glpi_tickets.id' => $ticket_id
-            ],
-            'LIMIT' => 1
+                'id' => $ticket_id
+            ]
+,            'LIMIT' => 1
         ]);
 
-        if ($ticket_data = $iterator->next()) {
+        if ($ticket_data = $iterator->current()) {
             return $ticket_data;
         }
+
+  Toolbox::logInFile("notification","TG test");
 
         return false;
     }

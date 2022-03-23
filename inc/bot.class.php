@@ -66,6 +66,7 @@ class PluginTelegrambotBot
     {
         $chat_id = self::getChatID($to);
         $telegram = self::getTelegramInstance();
+Toolbox::logInFile("notification","Telegrambot sendMessage to=".$to.";content=".explode("\n",$content)[0].";chat_id=".$chat_id."\n");
         $result = Request::sendMessage(['chat_id' => $chat_id, 'text' => $content]);
     }
 
@@ -105,7 +106,7 @@ class PluginTelegrambotBot
             'WHERE' => ['glpi_plugin_telegrambot_users.id' => $user_id]
         ]);
 
-        if ($row = $result->next()) {
+        if ($row = $result->current()) {
             $chat_id = $row['id'];
         }
 
@@ -162,6 +163,7 @@ class PluginTelegrambotBot
             
             $result = $telegram->setWebhook($hook_url);
             if ($result->isOk()) {
+Toolbox::logInFile("notification","Telegrambot set webhook.$result=".json_encode($result));
                 //echo $result->getDescription();
                 return true;
             }

@@ -76,6 +76,11 @@ class LoginCommand extends UserCommand
         }else{
             $response = \PluginTelegrambotUser::userLoginViaTelegrambot($user_chat, $text);
         }
+
+
+        if(!$text){
+            $response = 'Command usage: ' . $this->getUsage();
+        }
         
         $data = [
             'chat_id' => $chat_id,

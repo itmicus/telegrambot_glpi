@@ -117,6 +117,7 @@ HTML;
         $token_valid_time   = \json_decode(\base64_decode($split_token_parts[0]), true);
         $token_payload_data = \json_decode(\base64_decode($split_token_parts[1]), true);
         $token_hash         = \base64_decode($split_token_parts[2], true);
+//Toolbox::logInFile("notification","validateTemporaryAccessToken token=".json_encode($_GET['t']));
         
         // Expired Token
         if($token_valid_time['valid_until'] < time()){
@@ -144,8 +145,8 @@ HTML;
         global $DB;
         
         $user = $DB->request([
-            'FIELDS' => ['glpi.glpi_users.id', 'glpi.glpi_users.name'],
-            'FROM' => 'glpi.glpi_users',
+            'SELECT' => ['glpi_users.id', 'glpi_users.name'],
+            'FROM' => 'glpi_users',
             'INNER JOIN' => [
                 'glpi_plugin_telegrambot_users' => [
                     'FKEY' => [
@@ -155,10 +156,12 @@ HTML;
                 ]
             ],
             'WHERE' => [
-                'glpi.glpi_plugin_telegrambot_users.username' => $user_chat
+                'glpi_plugin_telegrambot_users.username' => $user_chat
             ],
             'LIMIT' => 1
-        ])->next();
+        ])->current();
+
+//Toolbox::logInFile("notification","getGlpiUserByTelegramUsername user=".json_encode($user));
         
         if ($user) {
             return $user;

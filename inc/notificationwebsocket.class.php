@@ -39,7 +39,6 @@ class PluginTelegrambotNotificationWebsocket implements NotificationInterface {
     function sendNotification($options = array()) {
         $to = $options['to'];
         $content = $options['content_text'];
-
         PluginTelegrambotBot::sendMessage($to, $content);
         return true;
     }
